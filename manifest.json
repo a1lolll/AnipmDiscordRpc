@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "ani.pm to Discord Status",
+  "version": "3.6",
+  "description": "Updates Discord status directly from ani.pm with Rich Presence.",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": [
+    "https://*.ani.pm/*",
+    "https://embed.settlar.io/*",
+    "https://discord.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.ani.pm/*",
+        "https://embed.settlar.io/*"
+      ],
+      "all_frames": true,
+      "js": ["content-anipm.js"]
+    }
+  ]
+}
