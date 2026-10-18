@@ -1,5 +1,4 @@
-// Plak hier de RAW link naar je afbeelding op GitHub
-const GITHUB_IMAGE_URL = "https://raw.githubusercontent.com/GEBRUIKERSNAAM/REPO_NAAM/main/logo.png";
+const GITHUB_IMAGE_URL = "https://github.com/a1lolll/AnipmDiscordRpc/blob/main/AnipmLogo.png?raw=true";
 
 let socket = null;
 let heartbeatInterval = null;
