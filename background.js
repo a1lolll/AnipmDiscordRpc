@@ -1,4 +1,4 @@
-const GITHUB_IMAGE_URL = "https://github.com/a1lolll/AnipmDiscordRpc/blob/main/AnipmLogo.png?raw=true";
+const GITHUB_IMAGE_URL = "https://raw.githubusercontent.com/a1lolll/AnipmDiscordRpc/main/AnipmLogo.png";
 
 let socket = null;
 let heartbeatInterval = null;
