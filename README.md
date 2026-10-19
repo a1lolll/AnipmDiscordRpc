@@ -5,6 +5,11 @@ a simple browser extension and python ipc bridge that automatically syncs your a
 ![Ani.pm RPC Preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/show.png)
 
 ---
+## ani.pm info
+
+ - [website](https://ani.pm)
+ - [discord](discord.gg/anipm)
+
 
 ## features
 
@@ -264,6 +269,9 @@ debug mode also turns on the flask debugger, so only use it while testing and le
 - **status not visible on profile?** make sure "display current activity as a status message" is turned on under discord settings -> activity privacy
 
 ---
+#creator
+my discord user is; barkbarkdoggy
+if u have any questions feel free to send a friend request
 
 ## extra pictures
 
