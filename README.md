@@ -35,7 +35,9 @@ the system consists of two parts, the browser extension and the local rpc server
 
 ### 2. starting python rpc server
 
-make sure python 3.8 or higher is installed on your system
+make sure python 3.8 or higher is installed on your system and that discord is open
+
+only run one copy of the server at a time, it uses port `6969` and a second copy will fail to start
 
 #### windows
 1. open command prompt or powershell in the project folder
@@ -77,6 +79,8 @@ nix-shell --run "python discord_rpc.py"
 
 to stop the server while it runs in a terminal, press `ctrl + c`
 
+if you use a flatpak or snap version of discord, update pypresence with `pip install -U pypresence`
+
 ---
 
 ### 3. running in the background
@@ -107,15 +111,16 @@ start "" ".venv\Scripts\pythonw.exe" discord_rpc.py
 ##### quick background run (until you reboot)
 
 ```bash
-nohup .venv/bin/python discord_rpc.py > rpc.log 2>&1 &
+nohup .venv/bin/python -u discord_rpc.py > rpc.log 2>&1 &
 ```
 
 on nixos:
 ```bash
-nohup nix-shell --run "python discord_rpc.py" > rpc.log 2>&1 &
+nohup nix-shell --run "python -u discord_rpc.py" > rpc.log 2>&1 &
 ```
 
 - **check logs:** `tail -f rpc.log`
+- **check if it runs:** `pgrep -af discord_rpc`
 - **stop:**
   ```bash
   pkill -f discord_rpc.py
@@ -131,7 +136,7 @@ nohup nix-shell --run "python discord_rpc.py" > rpc.log 2>&1 &
 
    [Service]
    WorkingDirectory=/path/to/AnipmDiscordRpc
-   ExecStart=/path/to/AnipmDiscordRpc/.venv/bin/python discord_rpc.py
+   ExecStart=/path/to/AnipmDiscordRpc/.venv/bin/python -u discord_rpc.py
    Restart=on-failure
    RestartSec=10
 
@@ -140,7 +145,7 @@ nohup nix-shell --run "python discord_rpc.py" > rpc.log 2>&1 &
    ```
    on nixos use this line for `ExecStart` instead:
    ```ini
-   ExecStart=/run/current-system/sw/bin/nix-shell --run "python discord_rpc.py"
+   ExecStart=/run/current-system/sw/bin/nix-shell --run "python -u discord_rpc.py"
    ```
 2. enable and start it:
    ```bash
@@ -163,9 +168,10 @@ nohup nix-shell --run "python discord_rpc.py" > rpc.log 2>&1 &
 ##### quick background run (until you reboot)
 
 ```bash
-nohup .venv/bin/python discord_rpc.py > rpc.log 2>&1 &
+nohup .venv/bin/python -u discord_rpc.py > rpc.log 2>&1 &
 ```
 
+- **check logs:** `tail -f rpc.log`
 - **stop:** `pkill -f discord_rpc.py`
 
 ##### start on login (launch agent)
@@ -181,6 +187,7 @@ nohup .venv/bin/python discord_rpc.py > rpc.log 2>&1 &
      <key>ProgramArguments</key>
      <array>
        <string>/path/to/AnipmDiscordRpc/.venv/bin/python</string>
+       <string>-u</string>
        <string>/path/to/AnipmDiscordRpc/discord_rpc.py</string>
      </array>
      <key>WorkingDirectory</key>
@@ -205,25 +212,69 @@ nohup .venv/bin/python discord_rpc.py > rpc.log 2>&1 &
 
 ---
 
+### 4. logs & debug mode
+
+by default the server is quiet, it only prints a start line and errors, so a short log is normal
+
+to see what is going on, turn on debug mode with the `RPC_DEBUG` variable, then you will see every request from the extension, when it connects to discord and every status update
+
+#### windows (cmd)
+```cmd
+set RPC_DEBUG=1
+python discord_rpc.py
+```
+
+#### windows (powershell)
+```powershell
+$env:RPC_DEBUG = "1"
+python discord_rpc.py
+```
+
+#### linux & macos
+```bash
+RPC_DEBUG=1 python discord_rpc.py
+```
+
+#### nixos
+```bash
+RPC_DEBUG=1 nix-shell --run "python discord_rpc.py"
+```
+
+#### in the background
+```bash
+pkill -f discord_rpc.py
+RPC_DEBUG=1 nohup nix-shell --run "python -u discord_rpc.py" > rpc.log 2>&1 &
+tail -f rpc.log
+```
+
+for a systemd service add `Environment=RPC_DEBUG=1` under `[Service]`, for a launch agent add `RPC_DEBUG` with value `1` under an `EnvironmentVariables` key
+
+debug mode also turns on the flask debugger, so only use it while testing and leave it off otherwise
+
+---
+
 ## troubleshooting
 
-- **status not updating?** check if the python server (`discord_rpc.py`) is actively running, in a terminal or in the background
-- **not sure if the background server is running?** check `pythonw.exe` in your task manager on windows, or run `ps aux | grep discord_rpc` on linux and macos
-- **server exits when discord is not open yet?** start discord first, the systemd and launchd examples above also restart the server automatically
+- **status not updating?** check if the python server (`discord_rpc.py`) is actively running, in a terminal or in the background, then turn on debug mode and watch the log while you play a video
+- **no `POST /update` lines in the debug log?** the extension is not reaching the server, reload the extension on `chrome://extensions/` and refresh your ani.pm tab
+- **log shows "could not find discord"?** open discord, the server keeps running and connects on the next update, you dont have to restart it
+- **server fails with "address already in use"?** another copy is already running, check with `pgrep -af discord_rpc` on linux and macos or in the task manager on windows, stop it and start again
+- **not sure if the background server is running?** check `pythonw.exe` in your task manager on windows, or run `pgrep -af discord_rpc` on linux and macos
 - **vencord / custom clients:** if you use vencord, turn off the built-in `arrpc` plugin in your vencord settings
 - **status not visible on profile?** make sure "display current activity as a status message" is turned on under discord settings -> activity privacy
 
+---
 
 ## extra pictures
- 
+
 ![bleach preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/bleachpreview.png)
- 
+
 ![genres preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/genrespreview.png)
- 
+
 ![logo preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/logopreview.png)
- 
+
 ![my list preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/mylistpreview.png)
- 
+
 ![profile view](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/profileview.png)
- 
+
 ![search preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/searchpreview.png)
