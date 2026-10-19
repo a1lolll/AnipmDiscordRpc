@@ -8,7 +8,7 @@ a simple browser extension and python ipc bridge that automatically syncs your a
 ## ani.pm info
 
  - [website](https://ani.pm)
- - [discord](discord.gg/anipm)
+ - [discord](https://discord.gg/anipm)
 
 
 ## features
