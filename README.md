@@ -2,7 +2,7 @@
 
 a browser extension and Python IPC bridge that automatically syncs your active [ani.pm](https://ani.pm) watch state directly to your Discord profile as a custom **"Watching"** Rich Presence status
 
-![Ani.pm RPC Preview](https://raw.githubusercontent.com/a1lolll/AnipmDiscordRpc/main/pictures/show.png)
+![Ani.pm RPC Preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/show.png)
 
 ---
 
