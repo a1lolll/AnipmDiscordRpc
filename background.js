@@ -1,173 +1,49 @@
-const GITHUB_IMAGE_URL = "https://raw.githubusercontent.com/a1lolll/AnipmDiscordRpc/main/AnipmLogo.png";
+let state = {
+    title: "",
+    episode: "Watching",
+    bannerUrl: null,
+    videoData: null
+};
 
-let socket = null;
-let heartbeatInterval = null;
-let pendingActivity = null;
-
-let latestPageData = null;
-let latestVideoData = null;
-let lastSentActivityJson = "";
-
-function formatDiscordImage(url) {
-    if (GITHUB_IMAGE_URL && GITHUB_IMAGE_URL.startsWith('http')) {
-        return GITHUB_IMAGE_URL;
-    }
-    if (url && typeof url === 'string' && url.startsWith('http')) {
-        return url;
-    }
-    return "logo";
-}
-
-function connectGateway(token, activity) {
-    pendingActivity = activity;
-
-    if (socket && socket.readyState === WebSocket.OPEN) {
-        sendPresenceUpdate(activity);
-        return;
-    }
-
-    if (socket && socket.readyState === WebSocket.CONNECTING) {
-        return;
-    }
-
-    if (socket) {
-        socket.close();
-    }
-
-    socket = new WebSocket('wss://gateway.discord.gg/?v=9&encoding=json');
-
-    socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.op === 10) {
-            const interval = data.d.heartbeat_interval;
-            clearInterval(heartbeatInterval);
-            heartbeatInterval = setInterval(() => {
-                if (socket && socket.readyState === WebSocket.OPEN) {
-                    socket.send(JSON.stringify({ op: 1, d: null }));
-                }
-            }, interval);
-
-            socket.send(JSON.stringify({
-                op: 2,
-                d: {
-                    token: token,
-                    capabilities: 8189,
-                    properties: {
-                        os: "Windows",
-                        browser: "Chrome",
-                        device: "Chrome"
-                    }
-                }
-            }));
-        }
-
-        if (data.t === 'READY') {
-            if (pendingActivity) {
-                sendPresenceUpdate(pendingActivity);
-            }
-        }
-    };
-
-    socket.onclose = () => {
-        clearInterval(heartbeatInterval);
-        socket = null;
-    };
-
-    socket.onerror = (err) => {
-        console.error("Gateway Error:", err);
-    };
-}
-
-function sendPresenceUpdate(activity) {
-    if (!socket || socket.readyState !== WebSocket.OPEN) return;
-
-    socket.send(JSON.stringify({
-        op: 3,
-        d: {
-            since: null,
-            activities: activity ? [activity] : [],
-            status: "online",
-            afk: false
-        }
-    }));
-}
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "ANI_UPDATE_TOP") {
-        latestPageData = message.data;
-        updatePresence();
+        if (state.episode !== message.data.episode || state.title !== message.data.title) {
+            state.videoData = null;
+        }
+        state.title = message.data.title;
+        state.episode = message.data.episode;
+        state.bannerUrl = message.data.bannerUrl;
+        if (message.data.videoData) {
+            state.videoData = message.data.videoData;
+        }
+        sendToRPC();
     } else if (message.type === "ANI_UPDATE_VIDEO") {
-        latestVideoData = message.data;
-        updatePresence();
+        state.videoData = message.data;
+        sendToRPC();
     }
 });
 
-function updatePresence() {
-    if (!latestPageData) return;
+function sendToRPC() {
+    if (!state.title) return;
 
-    chrome.storage.local.get(['discordToken', 'extensionEnabled'], (data) => {
-        const token = data.discordToken;
-        const isEnabled = data.extensionEnabled !== false;
+    chrome.storage.local.get({ mainImageType: 'banner', showSmallLogo: true }, (settings) => {
+        const largeImage = (settings.mainImageType === 'banner' && state.bannerUrl) ? state.bannerUrl : "logo";
+        const smallImage = settings.showSmallLogo ? "logo" : null;
 
-        if (!isEnabled || !token) return;
-
-        const title = latestPageData.title;
-        let episode = latestPageData.episode;
-
-        const activeVideo = latestVideoData || latestPageData.videoData;
-
-        const currentTime = activeVideo ? activeVideo.currentTime : 0;
-        const duration = activeVideo ? activeVideo.duration : 0;
-        const isPaused = activeVideo ? activeVideo.isPaused : false;
-
-        if (isPaused) {
-            if (episode && !episode.includes("(Paused)")) {
-                episode = `${episode} (Paused)`;
-            }
-        } else {
-            episode = episode.replace(/\s*\(Paused\)/gi, "").trim();
-        }
-
-        const now = Date.now();
-        const activity = {
-            name: "ani.pm",
-            type: 3,
-            details: title,
-            state: episode,
-            application_id: "1561512577966538842",
-            assets: {
-                large_image: formatDiscordImage(latestPageData.imgUrl),
-                large_text: title
-            }
+        const payload = {
+            title: state.title,
+            episode: state.episode,
+            isPaused: state.videoData ? state.videoData.isPaused : true,
+            currentTime: state.videoData ? state.videoData.currentTime : 0,
+            duration: state.videoData ? state.videoData.duration : 0,
+            largeImage: largeImage,
+            smallImage: smallImage
         };
 
-        if (!isPaused && duration > 0) {
-            activity.timestamps = {
-                start: Math.floor(now - (currentTime * 1000)),
-                end: Math.floor(now + ((duration - currentTime) * 1000))
-            };
-        } else if (!isPaused && currentTime > 0) {
-            activity.timestamps = {
-                start: Math.floor(now - (currentTime * 1000))
-            };
-        }
-
-        const checkObj = {
-            title: title,
-            episode: episode,
-            isPaused: isPaused,
-            start: activity.timestamps?.start || 0,
-            end: activity.timestamps?.end || 0,
-            img: activity.assets.large_image
-        };
-        const currentJson = JSON.stringify(checkObj);
-
-        if (currentJson === lastSentActivityJson && socket && socket.readyState === WebSocket.OPEN) {
-            return;
-        }
-        lastSentActivityJson = currentJson;
-
-        connectGateway(token, activity);
+        fetch("http://127.0.0.1:6969/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).catch(() => {});
     });
 }
