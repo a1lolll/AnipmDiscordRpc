@@ -212,3 +212,18 @@ nohup .venv/bin/python discord_rpc.py > rpc.log 2>&1 &
 - **server exits when discord is not open yet?** start discord first, the systemd and launchd examples above also restart the server automatically
 - **vencord / custom clients:** if you use vencord, turn off the built-in `arrpc` plugin in your vencord settings
 - **status not visible on profile?** make sure "display current activity as a status message" is turned on under discord settings -> activity privacy
+
+
+## extra pictures
+ 
+![bleach preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/bleachpreview.png)
+ 
+![genres preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/genrespreview.png)
+ 
+![logo preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/logopreview.png)
+ 
+![my list preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/mylistpreview.png)
+ 
+![profile view](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/profileview.png)
+ 
+![search preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/searchpreview.png)
