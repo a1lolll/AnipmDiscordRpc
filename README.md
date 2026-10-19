@@ -26,8 +26,8 @@ the system consists of two parts, the browser extension and the local rpc server
 1. download or clone this repository to a folder on your computer
 2. open your browser and go to `chrome://extensions/` or `brave://extensions/`
 3. turn on **developer mode** in the top right
-4. click **load unpacked** and select the folder AnipmDiscordRpc/AnipmToDiscord
-/Extension
+4. click **load unpacked** and select the folder containing the .js codes
+   
 
 ---
 
