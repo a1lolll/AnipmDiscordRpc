@@ -1,6 +1,6 @@
 # ani.pm discord rich presence
 
-een simpele browser extensie en python ipc bridge die automatisch je ani.pm status synced naar je discord profiel als een "watching" status
+a simple browser extension and python ipc bridge that automatically syncs your ani.pm status to your discord profile as a "watching" status
 
 ![Ani.pm RPC Preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/show.png)
 
@@ -8,66 +8,66 @@ een simpele browser extensie en python ipc bridge die automatisch je ani.pm stat
 
 ## features
 
-- realtime video status met titel, aflevering, afspeeltijd en totale duur
-- dynamische anime banner of poster op je discord profiel
-- aanpasbaar menu via de extensie popup om te kiezen tussen banner of logo
-- werkt op windows, linux, nixos en macos
-- detecteert video status ook binnen player iframes
-- gebruikt de juiste activity type zodat andere apps je status niet overschrijven
+- realtime video status with title, episode, watch time and total duration
+- dynamic anime banner or poster on your discord profile
+- customizable menu via extension popup to choose between banner or logo
+- works on windows, linux, nixos and macos
+- detects video status inside player iframes too
+- uses proper activity type so other apps do not overwrite your status
 
 ---
 
-## setup & installatie
+## setup & installation
 
-het systeem bestaat uit twee delen, de browser extensie en de lokale rpc server (`discord_rpc.py`)
+the system consists of two parts, the browser extension and the local rpc server (`discord_rpc.py`)
 
-### 1. browser extensie installeren (chrome / brave / edge)
+### 1. installing browser extension (chrome / brave / edge)
 
-1. download of clone deze repository naar een map op je computer
-2. open je browser en ga naar `chrome://extensions/` of `brave://extensions/`
-3. zet **ontwikkelaarsmodus** (developer mode) aan rechtsboven
-4. klik op **uitgepakte extensie laden** (load unpacked) en kies de map met deze bestanden
+1. download or clone this repository to a folder on your computer
+2. open your browser and go to `chrome://extensions/` or `brave://extensions/`
+3. turn on **developer mode** in the top right
+4. click **load unpacked** and select the folder containing these files
 
 ---
 
-### 2. python rpc server opstarten
+### 2. starting python rpc server
 
-zorg dat python 3.8 of hoger geïnstalleerd is op je systeem
+make sure python 3.8 or higher is installed on your system
 
 #### windows
-1. open opdrachtenprompt of powershell in de projectmap
-2. maak en activeer een virtuele omgeving:
+1. open command prompt or powershell in the project folder
+2. create and activate a virtual environment:
    ```cmd
    python -m venv .venv
    .venv\Scripts\activate
    ```
-3. installeer de benodigde packages:
+3. install the required packages:
    ```cmd
    pip install flask flask-cors pypresence
    ```
-4. start de rpc server:
+4. start the rpc server:
    ```cmd
    python discord_rpc.py
    ```
 
 #### linux (ubuntu / debian / arch / fedora) & macos
-1. open de terminal in de projectmap
-2. maak en activeer een virtuele omgeving:
+1. open terminal in the project folder
+2. create and activate a virtual environment:
    ```bash
    python3 -m venv .venv
    source .venv/bin/activate
    ```
-3. installeer de benodigde packages:
+3. install the required packages:
    ```bash
    pip install flask flask-cors pypresence
    ```
-4. start de rpc server:
+4. start the rpc server:
    ```bash
    python discord_rpc.py
    ```
 
 #### nixos
-start de server direct via nix-shell:
+start the server directly using nix-shell:
 ```bash
 nix-shell --run "python discord_rpc.py"
 ```
@@ -76,6 +76,6 @@ nix-shell --run "python discord_rpc.py"
 
 ## troubleshooting
 
-- **status update niet?** controleer of de python server (`discord_rpc.py`) actief draait in je terminal
-- **vencord / custom clients:** als je vencord gebruikt, zet dan de ingebouwde `arrpc` plugin uit in je vencord instellingen
-- **status niet zichtbaar op profiel?** zorg dat "huidige activiteit als statusbericht weergeven" aan staat onder discord instellingen -> activiteitsprivacy
+- **status not updating?** check if the python server (`discord_rpc.py`) is actively running in your terminal
+- **vencord / custom clients:** if you use vencord, turn off the built-in `arrpc` plugin in your vencord settings
+- **status not visible on profile?** make sure "display current activity as a status message" is turned on under discord settings -> activity privacy
