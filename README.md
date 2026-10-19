@@ -75,10 +75,140 @@ start the server directly using nix-shell:
 nix-shell --run "python discord_rpc.py"
 ```
 
+to stop the server while it runs in a terminal, press `ctrl + c`
+
+---
+
+### 3. running in the background
+
+you dont have to keep a terminal open, pick your system below, every example shows how to start it, how to stop it and how to make it start on boot
+
+replace `/path/to/AnipmDiscordRpc` with the real path to your project folder
+
+#### windows
+
+create a file called `start_rpc.bat` in the project folder with this inside:
+```bat
+@echo off
+cd /d "%~dp0"
+start "" ".venv\Scripts\pythonw.exe" discord_rpc.py
+```
+
+- **start in background:** double click `start_rpc.bat`, `pythonw` runs without a console window
+- **stop:** open task manager, go to the details tab, end `pythonw.exe` or run this in a terminal (it stops every pythonw process):
+  ```cmd
+  taskkill /f /im pythonw.exe
+  ```
+- **start on boot:** press `win + r`, type `shell:startup` and press enter, then put a shortcut to `start_rpc.bat` in that folder
+- **remove autostart:** delete that shortcut from the same folder
+
+#### linux & nixos
+
+##### quick background run (until you reboot)
+
+```bash
+nohup .venv/bin/python discord_rpc.py > rpc.log 2>&1 &
+```
+
+on nixos:
+```bash
+nohup nix-shell --run "python discord_rpc.py" > rpc.log 2>&1 &
+```
+
+- **check logs:** `tail -f rpc.log`
+- **stop:**
+  ```bash
+  pkill -f discord_rpc.py
+  ```
+
+##### start on boot (systemd user service)
+
+1. create the file `~/.config/systemd/user/anipm-rpc.service`:
+   ```ini
+   [Unit]
+   Description=ani.pm discord rich presence
+   After=graphical-session.target
+
+   [Service]
+   WorkingDirectory=/path/to/AnipmDiscordRpc
+   ExecStart=/path/to/AnipmDiscordRpc/.venv/bin/python discord_rpc.py
+   Restart=on-failure
+   RestartSec=10
+
+   [Install]
+   WantedBy=default.target
+   ```
+   on nixos use this line for `ExecStart` instead:
+   ```ini
+   ExecStart=/run/current-system/sw/bin/nix-shell --run "python discord_rpc.py"
+   ```
+2. enable and start it:
+   ```bash
+   systemctl --user daemon-reload
+   systemctl --user enable --now anipm-rpc
+   ```
+
+- **status:** `systemctl --user status anipm-rpc`
+- **logs:** `journalctl --user -u anipm-rpc -f`
+- **stop:** `systemctl --user stop anipm-rpc`
+- **remove autostart:**
+  ```bash
+  systemctl --user disable --now anipm-rpc
+  rm ~/.config/systemd/user/anipm-rpc.service
+  systemctl --user daemon-reload
+  ```
+
+#### macos
+
+##### quick background run (until you reboot)
+
+```bash
+nohup .venv/bin/python discord_rpc.py > rpc.log 2>&1 &
+```
+
+- **stop:** `pkill -f discord_rpc.py`
+
+##### start on login (launch agent)
+
+1. create the file `~/Library/LaunchAgents/com.anipm.rpc.plist`:
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+   <plist version="1.0">
+   <dict>
+     <key>Label</key>
+     <string>com.anipm.rpc</string>
+     <key>ProgramArguments</key>
+     <array>
+       <string>/path/to/AnipmDiscordRpc/.venv/bin/python</string>
+       <string>/path/to/AnipmDiscordRpc/discord_rpc.py</string>
+     </array>
+     <key>WorkingDirectory</key>
+     <string>/path/to/AnipmDiscordRpc</string>
+     <key>RunAtLoad</key>
+     <true/>
+     <key>KeepAlive</key>
+     <true/>
+   </dict>
+   </plist>
+   ```
+2. load it:
+   ```bash
+   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.anipm.rpc.plist
+   ```
+
+- **stop and remove autostart:**
+  ```bash
+  launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.anipm.rpc.plist
+  rm ~/Library/LaunchAgents/com.anipm.rpc.plist
+  ```
+
 ---
 
 ## troubleshooting
 
-- **status not updating?** check if the python server (`discord_rpc.py`) is actively running in your terminal
+- **status not updating?** check if the python server (`discord_rpc.py`) is actively running, in a terminal or in the background
+- **not sure if the background server is running?** check `pythonw.exe` in your task manager on windows, or run `ps aux | grep discord_rpc` on linux and macos
+- **server exits when discord is not open yet?** start discord first, the systemd and launchd examples above also restart the server automatically
 - **vencord / custom clients:** if you use vencord, turn off the built-in `arrpc` plugin in your vencord settings
 - **status not visible on profile?** make sure "display current activity as a status message" is turned on under discord settings -> activity privacy
