@@ -1,6 +1,6 @@
 const DEFAULTS = { mainImageType: 'banner', showSmallLogo: true };
 const IMAGE_TYPES = ['banner', 'logo'];
-const REPO_URL = 'https://github.com/a1lolll/AnipmDiscordRpc';
+const REPO_URL = 'https://github.com/xvvvyyy/AnipmDiscordRpc';
 const SITE_URL = 'https://a1lolll.github.io/';
 
 document.addEventListener('DOMContentLoaded', () => {
