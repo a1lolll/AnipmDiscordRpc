@@ -11,7 +11,7 @@ a simple browser extension and python ipc bridge that automatically syncs your a
 - realtime video status with title, episode, watch time and total duration
 - dynamic anime banner or poster on your discord profile
 - customizable menu via extension popup to choose between banner or logo
-- works on windows, linux, nixos and macos
+- works on windows, linux and macos ( tho its only tested on [nixos](https://nixos.org/) )
 - detects video status inside player iframes too
 - uses proper activity type so other apps do not overwrite your status
 
