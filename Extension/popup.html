@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AniPm RPC</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #313338;
+      --row: #2b2d31;
+      --row-hover: #35373c;
+      --row-active: #3f4147;
+      --text: #f2f3f5;
+      --text-2: #b5bac1;
+      --muted: #80848e;
+      --blurple: #5865f2;
+      --green: #23a55a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      width: 300px;
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-2);
+      cursor: pointer;
+    }
+    .icon-btn:hover { background: var(--row); color: var(--text); }
+    .icon-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    :focus-visible { outline: 2px solid var(--blurple); outline-offset: 2px; }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-2);
+    }
+
+    section + section { margin-top: 20px; }
+
+    .list { display: grid; gap: 6px; }
+
+    .option,
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: 8px;
+      background: var(--row);
+      cursor: pointer;
+      transition: background-color .12s;
+    }
+
+    .option:hover,
+    .row:hover { background: var(--row-hover); }
+
+    .row { justify-content: space-between; }
+
+    .option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--text-2);
+      border-radius: 50%;
+    }
+
+    .radio::after {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      transform: scale(0);
+      transition: transform .12s;
+    }
+
+    .option:has(input:checked) { background: var(--row-active); }
+    .option:has(input:checked) .radio { border-color: var(--blurple); background: var(--blurple); }
+    .option:has(input:checked) .radio::after { transform: scale(.55); }
+    .option:has(input:focus-visible) { outline: 2px solid var(--blurple); outline-offset: 2px; }
+
+    .switch { position: relative; flex: none; width: 40px; height: 24px; }
+
+    .switch input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .track {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: var(--muted);
+      transition: background-color .12s;
+      pointer-events: none;
+    }
+
+    .track::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform .12s;
+    }
+
+    .switch input:checked + .track { background: var(--green); }
+    .switch input:checked + .track::after { transform: translateX(16px); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ani.pm RPC</h1>
+    <div class="header-actions">
+      <button id="siteBtn" class="icon-btn" type="button" title="Open website" aria-label="Open website">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm7.93 6h-3.14a15.7 15.7 0 00-1.52-4.06A8.03 8.03 0 0119.93 8zM12 4.05c1.07 1.33 1.9 3.12 2.22 4.95h-4.44c.32-1.83 1.15-3.62 2.22-4.95zM4.07 14a8.03 8.03 0 010-4h3.14a15.7 15.7 0 000 4zm0 2h3.14a15.7 15.7 0 001.52 4.06A8.03 8.03 0 014.07 16zm4.66 4.06a13.7 13.7 0 01-1.38-3.06h8.14a13.7 13.7 0 01-1.38 3.06 13.8 13.8 0 01-2.69.94 13.8 13.8 0 01-2.69-.94zM14.22 14H9.78a13.7 13.7 0 010-4h4.44a13.7 13.7 0 010 4zm.57 6.06c.62-.97 1.14-2.02 1.52-4.06h3.14a8.03 8.03 0 01-4.66 4.06zM18.81 10h-3.14a15.7 15.7 0 00-1.52-4.06A8.03 8.03 0 0118.81 10z"/>
+        </svg>
+      </button>
+      <button id="githubBtn" class="icon-btn" type="button" title="View on GitHub" aria-label="View on GitHub">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <section role="radiogroup" aria-labelledby="imageLabel">
+    <h2 id="imageLabel">Large image</h2>
+    <div class="list">
+      <label class="option">
+        <input type="radio" name="mainImageType" value="banner" checked>
+        <span class="radio"></span>
+        <span>Anime banner</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="mainImageType" value="logo">
+        <span class="radio"></span>
+        <span>ani.pm logo</span>
+      </label>
+    </div>
+  </section>
+
+  <section>
+    <h2>Small badge</h2>
+    <label class="row">
+      <span>Show ani.pm logo</span>
+      <span class="switch">
+        <input type="checkbox" id="showSmallLogo" role="switch" checked>
+        <span class="track"></span>
+      </span>
+    </label>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>
