@@ -1,7 +1,7 @@
 const DEFAULTS = { mainImageType: 'banner', showSmallLogo: true };
 const IMAGE_TYPES = ['banner', 'logo'];
 const REPO_URL = 'https://github.com/xvvvyyy/AnipmDiscordRpc';
-const SITE_URL = 'https://a1lolll.github.io/';
+const SITE_URL = 'https://xvvvyyy.github.io/';
 
 document.addEventListener('DOMContentLoaded', () => {
   const imageRadios = document.querySelectorAll('input[name="mainImageType"]');
