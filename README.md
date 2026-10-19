@@ -27,6 +27,7 @@ the system consists of two parts, the browser extension and the local rpc server
 2. open your browser and go to `chrome://extensions/` or `brave://extensions/`
 3. turn on **developer mode** in the top right
 4. click **load unpacked** and select the folder containing the .js codes
+   
    ![filenames Preview](https://github.com/a1lolll/AnipmDiscordRpc/blob/main/Pictures/filenames.png)
    
 
