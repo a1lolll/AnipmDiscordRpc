@@ -269,8 +269,10 @@ debug mode also turns on the flask debugger, so only use it while testing and le
 - **status not visible on profile?** make sure "display current activity as a status message" is turned on under discord settings -> activity privacy
 
 ---
-#creator
+## creator
+
 my discord user is; barkbarkdoggy
+
 if u have any questions feel free to send a friend request
 
 ## extra pictures
